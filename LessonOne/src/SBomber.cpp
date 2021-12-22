@@ -49,7 +49,8 @@ int _kbhit() {
 SBomber::SBomber()
   : exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
-  FileLoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
+    FileLoggerSingleton::getInstance().OpenLogFile("log.txt");
+    FileLoggerSingleton::getInstance().WriteToLog(std::string(__func__) + " was invoked");
 
   Plane* p = new Plane;
   p->SetDirection(1, 0.1);
@@ -327,8 +328,6 @@ void SBomber::TimeFinish() {
 }
 
 void SBomber::Run() {
-    FileLoggerSingleton::getInstance().OpenLogFile("log.txt");
-
     do {
         TimeStart();
 

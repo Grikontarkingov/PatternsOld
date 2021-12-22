@@ -1,0 +1,3 @@
+F:/GBTest/Patterns/LessonOne/cmake-build-debug/CMakeFiles/LessonOne.dir
+F:/GBTest/Patterns/LessonOne/cmake-build-debug/CMakeFiles/edit_cache.dir
+F:/GBTest/Patterns/LessonOne/cmake-build-debug/CMakeFiles/rebuild_cache.dir

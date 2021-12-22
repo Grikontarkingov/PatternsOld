@@ -50,6 +50,7 @@ private:
     int m_numberOfEvent = 0;
 
     LoggerSingleton() {}
+    ~LoggerSingleton(){}
 
     LoggerSingleton(const LoggerSingleton& root) = delete;
     LoggerSingleton& operator=(const LoggerSingleton&) = delete;

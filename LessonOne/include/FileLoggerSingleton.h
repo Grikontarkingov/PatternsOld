@@ -41,6 +41,7 @@ private:
     std::ofstream logOut;
 
     FileLoggerSingleton(){};
+    ~FileLoggerSingleton() = default;
     FileLoggerSingleton(const FileLoggerSingleton& root) = delete;
     FileLoggerSingleton& operator=(const FileLoggerSingleton&) = delete;
     virtual std::string GetCurDateTime() override;

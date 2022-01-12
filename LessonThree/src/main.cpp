@@ -1,4 +1,5 @@
-﻿#include "SBomber.h"
+﻿#include <conio.h>
+#include "SBomber.h"
 #include "MyTools.h"
 #include "ScreenSingleton.h"
 
@@ -40,7 +41,7 @@ int _kbhit() {
 int main(void) {
   MyTools::OpenLogFile("log.txt");
 
-  SBomber game;
+  SBomber game(false);
 
   do {
     game.TimeStart();

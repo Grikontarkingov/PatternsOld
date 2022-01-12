@@ -10,8 +10,8 @@
 #include <chrono>
 #include <thread>
 
-SBomber::SBomber()
-  : exitFlag(false), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
+SBomber::SBomber(const bool _forwardIteration)
+  : exitFlag(false), m_forwardIteration(_forwardIteration), startTime(0), finishTime(0), deltaTime(0), passedTime(0),
     fps(0), bombsNumber(10), score(0) {
   MyTools::WriteToLog(std::string(__func__) + " was invoked");
 
@@ -39,7 +39,37 @@ SBomber::SBomber()
   pGr->SetWidth(width - 2);
   vecStaticObj.push_back(pGr);
 
-  Tank* pTank = new Tank;
+  if(m_iWantStartThis){
+      TankAdapter* pTankAdapter = new TankAdapter(new TankAdaptee);
+      pTankAdapter->SetWidth(13);
+      pTankAdapter->SetPos(30, groundY - 1);
+      vecStaticObj.push_back(pTankAdapter);
+
+      pTankAdapter = new TankAdapter(new TankAdaptee);
+      pTankAdapter->SetWidth(13);
+      pTankAdapter->SetPos(50, groundY - 1);
+      vecStaticObj.push_back(pTankAdapter);
+  } else{
+      std::string temp;
+      temp += "30;";
+      temp += std::to_string(groundY - 1);
+      temp += ";13;";
+
+      TankFromString* pTankFromString = new TankFromString(temp);
+      vecStaticObj.push_back(pTankFromString);
+
+      temp.clear();
+      temp += "50;";
+      temp += std::to_string(groundY - 1);
+      temp += ";13;";
+
+      pTankFromString = new TankFromString(temp);
+      vecStaticObj.push_back(pTankFromString);
+  }
+
+
+
+  /*Tank* pTank = new Tank;
   pTank->SetWidth(13);
   pTank->SetPos(30, groundY - 1);
   vecStaticObj.push_back(pTank);
@@ -47,7 +77,7 @@ SBomber::SBomber()
   pTank = new Tank;
   pTank->SetWidth(13);
   pTank->SetPos(50, groundY - 1);
-  vecStaticObj.push_back(pTank);
+  vecStaticObj.push_back(pTank);*/
 
   House* pHouse = new House;
   pHouse->SetWidth(13);
@@ -151,20 +181,38 @@ void SBomber::DeleteStaticObj(GameObject* pObj) {
 
 std::vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const {
   std::vector<DestroyableGroundObject*> vec;
-  Tank* pTank;
-  House* pHouse;
-  for (size_t i = 0; i < vecStaticObj.size(); i++) {
-    pTank = dynamic_cast<Tank*>(vecStaticObj[i]);
-    if (pTank != nullptr) {
-      vec.push_back(pTank);
-      continue;
-    }
+  if(m_iWantStartThis){
+      TankAdapter* pTankAdapter;
+      House* pHouse;
+      for (size_t i = 0; i < vecStaticObj.size(); i++) {
+          pTankAdapter = dynamic_cast<TankAdapter*>(vecStaticObj[i]);
+          if (pTankAdapter != nullptr) {
+              vec.push_back(pTankAdapter);
+              continue;
+          }
 
-    pHouse = dynamic_cast<House*>(vecStaticObj[i]);
-    if (pHouse != nullptr) {
-      vec.push_back(pHouse);
-      continue;
-    }
+          pHouse = dynamic_cast<House*>(vecStaticObj[i]);
+          if (pHouse != nullptr) {
+              vec.push_back(pHouse);
+              continue;
+          }
+      }
+  } else{
+      TankFromString* pTankFromString;
+      House* pHouse;
+      for (size_t i = 0; i < vecStaticObj.size(); i++) {
+          pTankFromString = dynamic_cast<TankFromString*>(vecStaticObj[i]);
+          if (pTankFromString != nullptr) {
+              vec.push_back(pTankFromString);
+              continue;
+          }
+
+          pHouse = dynamic_cast<House*>(vecStaticObj[i]);
+          if (pHouse != nullptr) {
+              vec.push_back(pHouse);
+              continue;
+          }
+      }
   }
 
   return vec;
@@ -183,15 +231,21 @@ Ground* SBomber::FindGround() const {
   return nullptr;
 }
 
-std::vector<Bomb*> SBomber::FindAllBombs() const {
+std::vector<Bomb*> SBomber::FindAllBombs() {
   std::vector<Bomb*> vecBombs;
 
-  for (size_t i = 0; i < vecDynamicObj.size(); i++) {
-    Bomb* pBomb = dynamic_cast<Bomb*>(vecDynamicObj[i]);
-    if (pBomb != nullptr) {
-      vecBombs.push_back(pBomb);
+  Iterator* bombIterator;
+    if (m_forwardIteration) {
+        bombIterator = new BombIterator(vecDynamicObj);
+    } else {
+        bombIterator = new BombEvenOddIterator(vecDynamicObj);
     }
+
+    for (; !bombIterator->isDone(); bombIterator->Next()) {
+      vecBombs.push_back(bombIterator->GetBomb());
   }
+
+  delete bombIterator;
 
   return vecBombs;
 }

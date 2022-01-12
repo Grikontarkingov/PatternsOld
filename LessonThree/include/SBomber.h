@@ -7,12 +7,15 @@
 #include "Bomb.h"
 #include "Ground.h"
 #include "Tank.h"
+#include "Iterator.h"
+#include "TankAdapter.h"
+#include "TankFromString.h"
 
 class SBomber
 {
 public:
 
-    SBomber();
+    SBomber(const bool _forwardIteration);
     ~SBomber();
     
     inline bool GetExitFlag() const { return exitFlag; }
@@ -38,7 +41,7 @@ private:
     Plane * FindPlane() const;
     LevelGUI * FindLevelGUI() const;
     std::vector<DestroyableGroundObject*> FindDestoyableGroundObjects() const;
-    std::vector<Bomb*> FindAllBombs() const;
+    std::vector<Bomb*> FindAllBombs();
 
     void DropBomb();
 
@@ -46,6 +49,8 @@ private:
     std::vector<GameObject*> vecStaticObj;
     
     bool exitFlag;
+    const bool m_forwardIteration;
+    const bool m_iWantStartThis = false;
 
     uint64_t startTime, finishTime, passedTime;
     uint16_t bombsNumber, deltaTime, fps;

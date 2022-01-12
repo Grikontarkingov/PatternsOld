@@ -4,8 +4,8 @@
 
 #if defined(_WIN32) || defined(WIN32)
 
-#include <conio.h>
-
+//#include <conio.h>
+//
 #else
 
 #include <iostream>

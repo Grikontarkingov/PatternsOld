@@ -92,7 +92,7 @@ void SBomber::CheckObjects() {
   MyTools::WriteToLog(std::string(__func__) + " was invoked");
 
   CheckPlaneAndLevelGUI();
-  CheckBombsDecAndGround();
+  CheckBombsAndGround();
 };
 
 void SBomber::CheckPlaneAndLevelGUI() {
@@ -101,7 +101,7 @@ void SBomber::CheckPlaneAndLevelGUI() {
   }
 }
 
-/*void SBomber::CheckBombsAndGround() {
+void SBomber::CheckBombsAndGround() {
   std::vector<Bomb*> vecBombs = FindAllBombs();
   Ground* pGround = FindGround();
   const double y = pGround->GetY();
@@ -109,29 +109,12 @@ void SBomber::CheckPlaneAndLevelGUI() {
     if (vecBombs[i]->GetY() >= y) {
       pGround->AddCrater(vecBombs[i]->GetX());
       CheckDestoyableObjects(vecBombs[i]);
-        AbstractCommand* m_pCommand = new DeleteDynamicCommand(vecBombs[i], vecDynamicObj);
-        m_pCommand->Execute();
-        delete m_pCommand;
+      DeleteDynamicObj(vecBombs[i]);
     }
   }
-}*/
-
-void SBomber::CheckBombsDecAndGround() {
-    std::vector<BombDecorator*> vecBombsDec = FindAllBombsDec();
-    Ground* pGround = FindGround();
-    const double y = pGround->GetY();
-    for (size_t i = 0; i < vecBombsDec.size(); i++) {
-        if (vecBombsDec[i]->GetY() >= y) {
-            pGround->AddCrater(vecBombsDec[i]->GetX());
-            CheckDestoyableObjects(vecBombsDec[i]);
-            AbstractCommand* m_pCommand = new DeleteDynamicCommand(vecBombsDec[i], vecDynamicObj);
-            m_pCommand->Execute();
-            delete m_pCommand;
-        }
-    }
 }
 
-/*void SBomber::CheckDestoyableObjects(Bomb* pBomb) {
+void SBomber::CheckDestoyableObjects(Bomb* pBomb) {
   std::vector<DestroyableGroundObject*> vecDestoyableObjects =
       FindDestoyableGroundObjects();
   const double size = pBomb->GetWidth();
@@ -141,31 +124,12 @@ void SBomber::CheckBombsDecAndGround() {
     const double x2 = x1 + size;
     if (vecDestoyableObjects[i]->isInside(x1, x2)) {
       score += vecDestoyableObjects[i]->GetScore();
-      AbstractCommand* m_pCommand = new DeleteStaticCommand(vecDestoyableObjects[i], vecStaticObj);
-      m_pCommand->Execute();
-      delete m_pCommand;
+      DeleteStaticObj(vecDestoyableObjects[i]);
     }
   }
-}*/
-
-void SBomber::CheckDestoyableObjects(BombDecorator* pBombDec) {
-    std::vector<DestroyableGroundObject*> vecDestoyableObjects =
-            FindDestoyableGroundObjects();
-    const double size = pBombDec->GetWidth();
-    const double size_2 = size / 2;
-    for (size_t i = 0; i < vecDestoyableObjects.size(); i++) {
-        const double x1 = pBombDec->GetX() - size_2;
-        const double x2 = x1 + size;
-        if (vecDestoyableObjects[i]->isInside(x1, x2)) {
-            score += vecDestoyableObjects[i]->GetScore();
-            AbstractCommand* m_pCommand = new DeleteStaticCommand(vecDestoyableObjects[i], vecStaticObj);
-            m_pCommand->Execute();
-            delete m_pCommand;
-        }
-    }
 }
 
-/*void SBomber::DeleteDynamicObj(DynamicObject* pObj) {
+void SBomber::DeleteDynamicObj(DynamicObject* pObj) {
   auto it = vecDynamicObj.begin();
   for (; it != vecDynamicObj.end(); it++) {
     if (*it == pObj) {
@@ -173,9 +137,9 @@ void SBomber::CheckDestoyableObjects(BombDecorator* pBombDec) {
       break;
     }
   }
-}*/
+}
 
-/*void SBomber::DeleteStaticObj(GameObject* pObj) {
+void SBomber::DeleteStaticObj(GameObject* pObj) {
   auto it = vecStaticObj.begin();
   for (; it != vecStaticObj.end(); it++) {
     if (*it == pObj) {
@@ -183,28 +147,7 @@ void SBomber::CheckDestoyableObjects(BombDecorator* pBombDec) {
       break;
     }
   }
-}*/
-
-/*void SBomber::DropBomb() {
-    if (bombsNumber > 0) {
-        MyTools::WriteToLog(std::string(__func__) + " was invoked");
-
-        Plane* pPlane = FindPlane();
-        double x = pPlane->GetX() + 4;
-        double y = pPlane->GetY() + 2;
-
-        Bomb* pBomb = new Bomb;
-        pBomb->SetDirection(0.3, 1);
-        pBomb->SetSpeed(2);
-        pBomb->SetPos(x, y);
-        pBomb->SetWidth(SMALL_CRATER_SIZE);
-
-        vecDynamicObj.push_back(pBomb);
-        bombsNumber--;
-        score -= Bomb::BombCost;
-    }
-}*/
-
+}
 
 std::vector<DestroyableGroundObject*> SBomber::FindDestoyableGroundObjects() const {
   std::vector<DestroyableGroundObject*> vec;
@@ -240,7 +183,7 @@ Ground* SBomber::FindGround() const {
   return nullptr;
 }
 
-/*std::vector<Bomb*> SBomber::FindAllBombs() const {
+std::vector<Bomb*> SBomber::FindAllBombs() const {
   std::vector<Bomb*> vecBombs;
 
   for (size_t i = 0; i < vecDynamicObj.size(); i++) {
@@ -251,19 +194,6 @@ Ground* SBomber::FindGround() const {
   }
 
   return vecBombs;
-}*/
-
-std::vector<BombDecorator*> SBomber::FindAllBombsDec() const {
-    std::vector<BombDecorator*> vecBombsDec;
-
-    for (size_t i = 0; i < vecDynamicObj.size(); i++) {
-        BombDecorator* pBomb = dynamic_cast<BombDecorator*>(vecDynamicObj[i]);
-        if (pBomb != nullptr) {
-            vecBombsDec.push_back(pBomb);
-        }
-    }
-
-    return vecBombsDec;
 }
 
 Plane* SBomber::FindPlane() const {
@@ -286,16 +216,6 @@ LevelGUI* SBomber::FindLevelGUI() const {
   }
 
   return nullptr;
-}
-
-void SBomber::DropBombing() {
-    if(bombsNumber > 0){
-        AbstractCommand *m_pCommand = new DropNewBombCommand(FindPlane(), vecDynamicObj, bombsNumber, 2,SMALL_CRATER_SIZE);
-        m_pCommand->Execute();
-        bombsNumber--;
-        score -= Bomb::BombCost;
-        delete m_pCommand;
-    }
 }
 
 void SBomber::ProcessKBHit() {
@@ -322,15 +242,15 @@ void SBomber::ProcessKBHit() {
       break;
 
     case 'b':
-        DropBombing();
-        break;
+      DropBomb();
+      break;
 
     case 'B':
-        DropBombing();
-        break;
+      DropBomb();
+      break;
 
     default:
-        break;
+      break;
   }
 }
 
@@ -368,4 +288,24 @@ void SBomber::TimeFinish() {
   passedTime += deltaTime;
 
   MyTools::WriteToLog(std::string(__func__) + " deltaTime = ", (int)deltaTime);
+}
+
+void SBomber::DropBomb() {
+  if (bombsNumber > 0) {
+    MyTools::WriteToLog(std::string(__func__) + " was invoked");
+
+    Plane* pPlane = FindPlane();
+    double x = pPlane->GetX() + 4;
+    double y = pPlane->GetY() + 2;
+
+    Bomb* pBomb = new Bomb;
+    pBomb->SetDirection(0.3, 1);
+    pBomb->SetSpeed(2);
+    pBomb->SetPos(x, y);
+    pBomb->SetWidth(SMALL_CRATER_SIZE);
+
+    vecDynamicObj.push_back(pBomb);
+    bombsNumber--;
+    score -= Bomb::BombCost;
+  }
 }
